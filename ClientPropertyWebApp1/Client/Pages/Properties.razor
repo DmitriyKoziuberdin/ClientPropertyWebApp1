@@ -1,0 +1,60 @@
+﻿@page "/property" 
+@inject IPropertyService PropertyService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Property</PageTitle>
+
+<h3>Property</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>NameProperty</th>
+            <th>UserId</th>
+            <th>TypeOfProperty</th>
+            <th>PurchaseDate</th>
+            <th>InitialValue</th>
+            <th>PriceLossPeriod</th>
+            <th>PriceLossSelectedPeriod</th>
+            <th>CurrentValue</th>
+            <th>DaysOfPropertyOwnership</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var property in PropertyService.Properties)
+        {
+            <tr>
+                <td>@property.NameProperty</td>
+                <td>@property.UserId</td>
+                <td>@property.TypeOfProperty</td>
+                <td>@property.PurchaseDate</td>
+                <td>@property.InitialValue</td>
+                <td>@property.PriceLossPeriod</td>
+                <td>@property.PriceLossSelectedPeriod</td>
+                <td>@property.CurrentValue</td>
+                <td>@property.DaysOfPropertyOwnership</td>
+                <td>
+                    <button class="btn btn-primary" @onclick="(()=>ShowProperty(property.Id))"><i class="oi oi-pencil"></i></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<button class="btn btn-primary" @onclick="CreateNewProperty">Create New Property</button>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await PropertyService.GetProperties();
+    }
+
+    void ShowProperty(long id)
+    {
+        NavigationManager.NavigateTo($"/propertychange/{id}");
+    }
+
+    void CreateNewProperty()
+    {
+        NavigationManager.NavigateTo("/propertychange");
+    }
+}

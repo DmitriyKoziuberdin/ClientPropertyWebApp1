@@ -1,0 +1,89 @@
+﻿@page "/propertychange"
+@page "/propertychange/{id:int}"
+@inject IPropertyService PropertyService
+
+@if (Id == null)
+{
+    <PageTitle>Create a new Property</PageTitle>
+    <h3>Create a new Property</h3>
+}
+else
+{
+    <PageTitle>Edit @property.NameProperty</PageTitle>
+    <h3>Edit @property.NameProperty</h3>
+}
+
+<EditForm Model="property" OnSubmit="HandleSubmit">
+    <div>
+        <label for="nameproperty">Name Property</label>
+        <InputText id="nameproperty" @bind-Value="property.NameProperty" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for="typeofproperty">Type of Property</label>
+        <InputText id="typeofproperty" @bind-Value="property.TypeOfProperty" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for="initialvalue">Initial Value</label>
+        <InputNumber id="initialvalue" @bind-Value="property.InitialValue" class="form-control"></InputNumber>
+    </div>
+    <div>
+        <label for="pricelossselectedperiod">Price Loss Selected Period</label>
+        <InputNumber id="pricelossselectedperiod" @bind-Value="property.PriceLossSelectedPeriod" class="form-control"></InputNumber>
+    </div>
+    <div>
+        <label>User</label><br />
+        <InputSelect @bind-Value="property.UserId" class="form-select">
+            @foreach (var user in PropertyService.Users)
+            {
+                <option value="@user.Id">@user.Name</option>
+            }
+        </InputSelect>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">@btnText</button>
+    <button type="button" class="btn btn-danger" @onclick="DeleteProperty" >Delete Property</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+    string btnText = string.Empty;
+    Property property = new Property { User = new User() };
+
+    protected override async Task OnInitializedAsync()
+    {
+        btnText = Id == null ? "Save New Property" : "Update Property";
+        await PropertyService.GetUsers();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if(Id == null)
+        {
+            property.User = PropertyService.Users[0];
+            property.UserId = property.User.Id;
+        }
+        else
+        {
+            property = await PropertyService.GetSingleProperty((int)Id);
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if(Id == null)
+        {
+            await PropertyService.CreateProperty(property);
+        }
+        else
+        {
+            await PropertyService.UpdateProperty(property);
+        }
+    }
+
+    async Task DeleteProperty()
+    {
+        await PropertyService.DeleteProperty(property.Id);
+    }
+
+}

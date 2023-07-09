@@ -1,0 +1,79 @@
+﻿@page "/userchange"
+@page "/userchange/{id:int}"
+@inject IUserService UserService
+
+@if (Id == null)
+{
+    <PageTitle>Create a new User</PageTitle>
+    <h3>Create a new User</h3>
+}
+else
+{
+    <PageTitle>Edit @user.Name</PageTitle>
+    <h3>Edit @user.Name</h3>
+}
+
+<EditForm Model="user" OnSubmit="HandleSubmit">
+    <div>
+        <label for="name">Name</label>
+        <InputText id="name" @bind-Value="user.Name" class="form-contorl"></InputText>
+    </div>
+    <div>
+        <label for="address">Address</label>
+        <InputText id="address" @bind-Value="user.Address" class="form-contorl"></InputText>
+    </div>
+    <div>
+        <label for="telephone">Telephone</label>
+        <InputText id="telephone" @bind-Value="user.Telephone" class="form-contorl"></InputText>
+    </div>
+    <div>
+        <label for="email">Email</label>
+        <InputText id="email" @bind-Value="user.Email" class="form-contorl"></InputText>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">@btnText</button>
+    <button type="button" class="btn btn-danger" @onclick="DeleteUser">Delete User</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+    string btnText = string.Empty;
+    User user = new User();
+
+    protected override async Task OnInitializedAsync()
+    {
+        btnText = Id == null ? "Save New User" : "Update User";
+        await UserService.GetUsers();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id == null)
+        {
+            
+        }
+        else
+        {
+            user = await UserService.GetSingleUser((int)Id);
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if (Id == null)
+        {
+            await UserService.CreateUser(user);
+        }
+        else
+        {
+            await UserService.UpdateUser(user);
+        }
+    }
+
+    async Task DeleteUser()
+    {
+        await UserService.DeleteUser(user.Id);
+    }
+
+}

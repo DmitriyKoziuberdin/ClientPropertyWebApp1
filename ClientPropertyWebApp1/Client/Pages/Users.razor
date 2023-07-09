@@ -1,0 +1,54 @@
+﻿@page "/user"
+@inject IUserService UserService
+@inject NavigationManager NavigationManager
+
+<PageTitle>User</PageTitle>
+
+<h3>User</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Telephone</th>
+            <th>Email</th>
+            <th>InitialSumOfUserProperty</th>
+            <th>CurrentSumOfUserProperty</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in UserService.Users)
+        {
+            <tr>
+                <td>@user.Name</td>
+                <td>@user.Address</td>
+                <td>@user.Telephone</td>
+                <td>@user.Email</td>
+                <td>@user.InitialSumOfUserProperty</td>
+                <td>@user.CurrentSumOfUserProperty</td>
+                <td>
+                    <button class="btn btn-primary" @onclick="(()=>ShowUser(user.Id))"><i class="oi oi-pencil"></i></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<button class="btn btn-primary" @onclick="CreateNewUser">Create New User</button>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await UserService.GetUsers();
+    }
+
+    void ShowUser(long id)
+    {
+        NavigationManager.NavigateTo($"/userchange/{id}");
+    }
+
+    void CreateNewUser()
+    {
+        NavigationManager.NavigateTo("/userchange");
+    }
+}
